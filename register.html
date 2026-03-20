@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account – TSF27 | Teaching Service Commission</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="auth-page">
+
+  <!-- ── Left Banner ── -->
+  <div class="auth-banner">
+    <div class="pattern"></div>
+    <div class="auth-banner-content">
+      <div class="crest">🏛️</div>
+      <h1>Teaching Service Commission</h1>
+      <p class="subtitle">Papua New Guinea — TSF27 Portal</p>
+      <span class="form-label">Teacher Registration</span>
+      <blockquote class="quote">
+        "Register to submit, track, and manage your<br>
+        TSF27 Teacher Admissions Management Form<br>
+        securely online."
+      </blockquote>
+      <div style="margin-top:2rem; display:flex; flex-direction:column; gap:.6rem; font-size:.82rem; color:rgba(255,255,255,.55);">
+        <div>✔ Secure encrypted data storage</div>
+        <div>✔ Save drafts and resume anytime</div>
+        <div>✔ Track your application status</div>
+        <div>✔ Instant TSC notifications</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right Panel ── -->
+  <div class="auth-panel">
+    <div class="auth-form-wrap">
+      <h2>Create Account</h2>
+      <p class="auth-tagline">Register to submit your TSF27 application.</p>
+
+      <div id="alert-box" class="alert alert-error" style="display:none;"></div>
+      <div id="success-box" class="alert alert-success" style="display:none;"></div>
+
+      <form id="register-form" novalidate>
+
+        <div class="form-group">
+          <label for="full-name">Full Name <span class="req">*</span></label>
+          <input
+            type="text" id="full-name" name="full_name"
+            class="form-control" placeholder="e.g. John Smith Kila"
+            autocomplete="name" required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address <span class="req">*</span></label>
+          <input
+            type="email" id="email" name="email"
+            class="form-control" placeholder="yourname@example.com"
+            autocomplete="email" required
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="password">Password <span class="req">*</span></label>
+            <div class="password-wrap">
+              <input
+                type="password" id="password" name="password"
+                class="form-control" placeholder="Min 8 characters"
+                autocomplete="new-password" required minlength="8"
+              />
+              <button type="button" class="toggle-pw" onclick="togglePw('password', this)">👁</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="confirm-pw">Confirm Password <span class="req">*</span></label>
+            <div class="password-wrap">
+              <input
+                type="password" id="confirm-pw" name="confirm_pw"
+                class="form-control" placeholder="Repeat password"
+                autocomplete="new-password" required
+              />
+              <button type="button" class="toggle-pw" onclick="togglePw('confirm-pw', this)">👁</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password strength -->
+        <div id="pw-strength" style="margin-top:-.5rem; margin-bottom:1rem; display:none;">
+          <div style="height:4px; border-radius:4px; background:var(--gray-200); margin-bottom:.3rem;">
+            <div id="pw-bar" style="height:100%; border-radius:4px; transition:all .3s; width:0%;"></div>
+          </div>
+          <span id="pw-label" style="font-size:.78rem;"></span>
+        </div>
+
+        <div class="form-group">
+          <label style="display:flex; align-items:flex-start; gap:.6rem; cursor:pointer; text-transform:none; letter-spacing:0; font-weight:400; color:var(--gray-600); font-size:.88rem;">
+            <input type="checkbox" id="agree-terms" required style="margin-top:.15rem; flex-shrink:0;" />
+            I agree to the
+            <a href="#" style="color:var(--navy); font-weight:600;">Terms of Service</a>
+            and confirm that I am a serving or prospective teacher seeking TSC admission.
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="register-btn">
+          Create Account
+        </button>
+
+      </form>
+
+      <div class="divider">Already have an account?</div>
+
+      <a href="index.html" class="btn btn-outline btn-block" style="justify-content:center;">
+        Sign In
+      </a>
+
+      <p style="margin-top:2rem; font-size:.8rem; color:var(--gray-400); text-align:center;">
+        TSF27 Teacher Admissions Management System<br>
+        © Teaching Service Commission, Papua New Guinea
+      </p>
+    </div>
+  </div>
+
+</div><!-- .auth-page -->
+
+<div id="toast-container"></div>
+
+<!-- Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+(async () => { await Auth.requireGuest(); })();
+
+const form        = document.getElementById('register-form');
+const alertBox    = document.getElementById('alert-box');
+const successBox  = document.getElementById('success-box');
+const registerBtn = document.getElementById('register-btn');
+const pwInput     = document.getElementById('password');
+
+// Password strength meter
+pwInput.addEventListener('input', () => {
+  const pw    = pwInput.value;
+  const wrap  = document.getElementById('pw-strength');
+  const bar   = document.getElementById('pw-bar');
+  const label = document.getElementById('pw-label');
+
+  if (!pw) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+
+  let score = 0;
+  if (pw.length >= 8)  score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+  const levels = [
+    { w: '25%', color: '#ef4444', text: 'Weak' },
+    { w: '50%', color: '#f97316', text: 'Fair' },
+    { w: '75%', color: '#eab308', text: 'Good' },
+    { w: '100%',color: '#22c55e', text: 'Strong' },
+  ];
+  const lvl = levels[score - 1] || levels[0];
+  bar.style.width     = lvl.w;
+  bar.style.background = lvl.color;
+  label.textContent   = `Password strength: ${lvl.text}`;
+  label.style.color   = lvl.color;
+});
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  alertBox.style.display   = 'none';
+  successBox.style.display = 'none';
+
+  const fullName  = document.getElementById('full-name').value.trim();
+  const email     = document.getElementById('email').value.trim();
+  const password  = document.getElementById('password').value;
+  const confirmPw = document.getElementById('confirm-pw').value;
+  const agreed    = document.getElementById('agree-terms').checked;
+
+  if (!fullName || !email || !password) {
+    showAlert('Please fill in all required fields.'); return;
+  }
+  if (password.length < 8) {
+    showAlert('Password must be at least 8 characters.'); return;
+  }
+  if (password !== confirmPw) {
+    showAlert('Passwords do not match.'); return;
+  }
+  if (!agreed) {
+    showAlert('You must agree to the Terms of Service.'); return;
+  }
+
+  registerBtn.disabled    = true;
+  registerBtn.textContent = 'Creating Account…';
+
+  const { data, error } = await db.auth.signUp({
+    email,
+    password,
+    options: { data: { full_name: fullName } }
+  });
+
+  if (error) {
+    showAlert(error.message);
+    registerBtn.disabled    = false;
+    registerBtn.textContent = 'Create Account';
+    return;
+  }
+
+  successBox.style.display = 'flex';
+  successBox.innerHTML = `
+    ✅ Account created! Please check <strong>${email}</strong> to confirm your address,
+    then <a href="index.html" style="color:var(--green); font-weight:600;">sign in here</a>.
+  `;
+  form.style.display = 'none';
+});
+
+function showAlert(msg) {
+  alertBox.style.display = 'flex';
+  alertBox.innerHTML = `⚠️ ${msg}`;
+}
+
+function togglePw(id, btn) {
+  const input = document.getElementById(id);
+  const show  = input.type === 'password';
+  input.type  = show ? 'text' : 'password';
+  btn.textContent = show ? '🙈' : '👁';
+}
+</script>
+</body>
+</html>

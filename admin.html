@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel – TSF27 | Teaching Service Commission</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-brand">
+    <div class="brand-icon">🏛️</div>
+    <span>TSC — TSF27 Admin</span>
+  </div>
+  <ul class="navbar-nav">
+    <li><a href="dashboard.html">📋 My Dashboard</a></li>
+    <li><a href="admin.html" class="active">⚙️ Admin Panel</a></li>
+  </ul>
+  <div class="navbar-user" id="nav-user">
+    <div class="avatar">?</div>
+    <span>Loading…</span>
+  </div>
+  <button class="btn-logout" onclick="Auth.signOut()">Sign Out</button>
+</nav>
+
+<div class="page-content">
+
+  <div class="page-header">
+    <div>
+      <h1>⚙️ Admin Panel</h1>
+      <p>Review and process TSF27 Teacher Admissions Applications.</p>
+    </div>
+    <div style="display:flex; gap:.75rem;">
+      <select id="filter-status" class="form-control" style="width:160px;">
+        <option value="">All Status</option>
+        <option value="submitted">Submitted</option>
+        <option value="draft">Draft</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <input type="search" id="search-input" class="form-control" placeholder="Search by name…" style="width:200px;" />
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card navy"><div class="stat-icon">📋</div><div class="stat-value" id="count-all">—</div><div class="stat-label">Total</div></div>
+    <div class="stat-card gold"><div class="stat-icon">🕐</div><div class="stat-value" id="count-submitted">—</div><div class="stat-label">Pending Review</div></div>
+    <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-value" id="count-approved">—</div><div class="stat-label">Approved</div></div>
+    <div class="stat-card red"><div class="stat-icon">❌</div><div class="stat-value" id="count-rejected">—</div><div class="stat-label">Rejected</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>All TSF27 Applications</h3></div>
+    <div id="table-area"><div class="loader-wrap"><div class="spinner"></div></div></div>
+  </div>
+
+</div>
+
+<!-- Decision Modal -->
+<div id="decision-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; align-items:flex-start; justify-content:center; padding:2rem; overflow-y:auto;">
+  <div style="background:white; border-radius:14px; max-width:680px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,.3); margin-top:1rem;">
+    <div style="background:var(--navy-dark); border-radius:14px 14px 0 0; padding:1.25rem 1.5rem; display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="font-family:var(--font-heading); color:white; font-size:1.1rem;">📋 TSF27 Application Review</h3>
+      <button onclick="closeDecisionModal()" style="background:rgba(255,255,255,.15); border:none; color:white; border-radius:6px; padding:.3rem .6rem; cursor:pointer;">✕</button>
+    </div>
+    <div id="modal-content" style="padding:1.5rem;"></div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+let allForms = [];
+
+(async () => {
+  const user = await Auth.requireAuth();
+  if (!user) return;
+  await initNavbar();
+
+  // Check admin role
+  const { data: profile } = await db.from('teacher_profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'tsc_officer'].includes(profile.role)) {
+    showToast('Access denied. Admin or TSC Officer role required.', 'error');
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
+    return;
+  }
+
+  await loadAllForms();
+})();
+
+async function loadAllForms() {
+  const { data, error } = await db
+    .from('form27_submissions')
+    .select('id, first_name, sur_name, sector, status, submitted_at, created_at, updated_at, teaching_prov, highest_qualification, tsc_decision, admission_id_number')
+    .order('submitted_at', { ascending: false, nullsFirst: false });
+
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  allForms = data || [];
+  updateStats(allForms);
+  renderTable(allForms);
+}
+
+function updateStats(forms) {
+  document.getElementById('count-all').textContent      = forms.length;
+  document.getElementById('count-submitted').textContent= forms.filter(f => f.status === 'submitted').length;
+  document.getElementById('count-approved').textContent = forms.filter(f => f.status === 'approved').length;
+  document.getElementById('count-rejected').textContent = forms.filter(f => f.status === 'rejected').length;
+}
+
+function renderTable(forms) {
+  const area = document.getElementById('table-area');
+  if (!forms.length) {
+    area.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><h3>No Applications Found</h3></div>`;
+    return;
+  }
+  area.innerHTML = `
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Applicant</th>
+            <th>Sector</th>
+            <th>Province</th>
+            <th>Qualification</th>
+            <th>Status</th>
+            <th>Submitted</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${forms.map((f,i) => `
+            <tr>
+              <td style="font-size:.8rem; color:var(--gray-400);">${i+1}</td>
+              <td><strong>${[f.first_name,f.sur_name].filter(Boolean).join(' ') || '<em>Draft</em>'}</strong></td>
+              <td>${f.sector || '—'}</td>
+              <td>${f.teaching_prov || '—'}</td>
+              <td>${f.highest_qualification || '—'}</td>
+              <td>${statusBadge(f.status)}</td>
+              <td style="font-size:.82rem;">${f.submitted_at ? formatDate(f.submitted_at) : '—'}</td>
+              <td>
+                <div style="display:flex; gap:.4rem;">
+                  ${f.status === 'submitted'
+                    ? `<button class="btn btn-primary" style="padding:.35rem .75rem; font-size:.8rem;" onclick="openDecision('${f.id}')">Review</button>`
+                    : `<button class="btn btn-outline" style="padding:.35rem .75rem; font-size:.8rem;" onclick="openDecision('${f.id}')">View</button>`
+                  }
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+document.getElementById('filter-status').addEventListener('change', applyFilter);
+document.getElementById('search-input').addEventListener('input', applyFilter);
+function applyFilter() {
+  const status = document.getElementById('filter-status').value;
+  const search = document.getElementById('search-input').value.toLowerCase();
+  let f = allForms;
+  if (status) f = f.filter(x => x.status === status);
+  if (search) f = f.filter(x => `${x.first_name} ${x.sur_name}`.toLowerCase().includes(search));
+  renderTable(f);
+}
+
+async function openDecision(id) {
+  const modal = document.getElementById('decision-modal');
+  document.getElementById('modal-content').innerHTML = `<div class="loader-wrap"><div class="spinner"></div></div>`;
+  modal.style.display = 'flex';
+
+  const { data, error } = await db.from('form27_submissions').select('*').eq('id', id).single();
+  if (error || !data) { document.getElementById('modal-content').innerHTML = '<p style="color:red;">Error loading form.</p>'; return; }
+
+  const f = (val) => val || '<span style="color:var(--gray-400)">—</span>';
+  const row = (label, val) => `<tr><td style="font-weight:600;color:var(--gray-600);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;padding:.5rem .75rem;border-bottom:1px solid var(--gray-100);white-space:nowrap;">${label}</td><td style="padding:.5rem .75rem;border-bottom:1px solid var(--gray-100);font-size:.9rem;">${f(val)}</td></tr>`;
+
+  const isEditable = data.status === 'submitted';
+
+  document.getElementById('modal-content').innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+      <div>
+        <h4 style="font-family:var(--font-heading); color:var(--navy-dark); margin-bottom:.75rem;">Personal Details</h4>
+        <table style="width:100%; border-collapse:collapse;">
+          ${row('Full Name', [data.first_name, data.sur_name].filter(Boolean).join(' '))}
+          ${row('Gender', data.gender === 'M' ? 'Male' : data.gender === 'F' ? 'Female' : null)}
+          ${row('Date of Birth', formatDate(data.date_of_birth))}
+          ${row('Marital Status', data.marital_status)}
+          ${row('Mobile No.', data.mobile_no)}
+          ${row('Sector', data.sector)}
+          ${row('Appointment', data.appointment_status)}
+        </table>
+      </div>
+      <div>
+        <h4 style="font-family:var(--font-heading); color:var(--navy-dark); margin-bottom:.75rem;">Teaching & Qualifications</h4>
+        <table style="width:100%; border-collapse:collapse;">
+          ${row('Home Province', data.home_province)}
+          ${row('Teaching Province', data.teaching_prov)}
+          ${row('Teaching Location', data.teaching_location)}
+          ${row('Start Date', formatDate(data.start_date))}
+          ${row('Highest Qual.', data.highest_qualification)}
+          ${row('Institution', data.institution_graduated)}
+          ${row('Reg. Status', data.teacher_reg_cert_status)}
+        </table>
+      </div>
+    </div>
+
+    <hr style="margin:1.25rem 0; border:none; border-top:1px solid var(--gray-200);" />
+
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:.75rem;">
+      <h4 style="font-family:var(--font-heading); color:var(--navy-dark);">8. TSC Decision</h4>
+      ${statusBadge(data.status)}
+    </div>
+
+    ${isEditable ? `
+    <div style="background:var(--gold-pale); border:1.5px solid var(--gold); border-radius:var(--radius); padding:1.25rem; margin-bottom:1rem;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem;">
+        <div class="form-group" style="margin:0;">
+          <label>Decision <span class="req">*</span></label>
+          <select id="admin-decision" class="form-control">
+            <option value="">— Select Decision —</option>
+            <option value="Approved">Approved</option>
+            <option value="Not Approved">Not Approved</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Approval Type</label>
+          <select id="admin-approval-type" class="form-control">
+            <option value="">— Select Type —</option>
+            <option value="Provisional">Provisional</option>
+            <option value="Full">Full</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Teacher Admission Membership ID</label>
+          <input type="text" id="admin-admission-id" class="form-control" placeholder="TSC-XXXX-XXXX" value="${data.admission_id_number || ''}" />
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label>Commissioner Name</label>
+          <input type="text" id="admin-commissioner" class="form-control" placeholder="Commissioner full name" value="${data.tsc_commissioner || ''}" />
+        </div>
+      </div>
+      <div style="display:flex; gap:.75rem; justify-content:flex-end;">
+        <button class="btn btn-outline" onclick="closeDecisionModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveDecision('${id}')">Save Decision</button>
+      </div>
+    </div>
+    ` : `
+    <div style="background:var(--gray-50); border:1px solid var(--gray-200); border-radius:var(--radius); padding:1rem;">
+      <table style="width:100%; border-collapse:collapse;">
+        ${row('Decision', data.tsc_decision)}
+        ${row('Approval Type', data.approval_type)}
+        ${row('Admission ID', data.admission_id_number)}
+        ${row('Commissioner', data.tsc_commissioner)}
+      </table>
+    </div>
+    `}
+  `;
+
+  // Pre-fill decision if exists
+  if (data.tsc_decision) {
+    const el = document.getElementById('admin-decision');
+    if (el) el.value = data.tsc_decision;
+  }
+  if (data.approval_type) {
+    const el = document.getElementById('admin-approval-type');
+    if (el) el.value = data.approval_type;
+  }
+}
+
+async function saveDecision(id) {
+  const decision     = document.getElementById('admin-decision')?.value;
+  const approvalType = document.getElementById('admin-approval-type')?.value;
+  const admissionId  = document.getElementById('admin-admission-id')?.value?.trim();
+  const commissioner = document.getElementById('admin-commissioner')?.value?.trim();
+
+  if (!decision) { showToast('Please select a Decision.', 'error'); return; }
+
+  const payload = {
+    tsc_decision:       decision,
+    approval_type:      approvalType || null,
+    admission_id_number:admissionId || null,
+    tsc_commissioner:   commissioner || null,
+    status: decision === 'Approved' ? 'approved' : 'rejected',
+  };
+
+  const { error } = await db.from('form27_submissions').update(payload).eq('id', id);
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+
+  showToast(`Application ${payload.status}!`, 'success');
+  closeDecisionModal();
+  await loadAllForms();
+}
+
+function closeDecisionModal() {
+  document.getElementById('decision-modal').style.display = 'none';
+}
+</script>
+</body>
+</html>

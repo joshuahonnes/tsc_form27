@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TSF27 Application – Teaching Service Commission</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .qual-check { display:flex; align-items:center; gap:.6rem; margin-bottom:.5rem; }
+    .qual-check input[type=checkbox] { width:18px; height:18px; cursor:pointer; accent-color:var(--navy); }
+    .submit-review-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem 1rem; }
+    @media(max-width:600px){ .submit-review-grid{ grid-template-columns:1fr 1fr; } }
+  </style>
+</head>
+<body class="form27-page">
+
+<!-- ── Navbar ── -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <div class="brand-icon">🏛️</div>
+    <span>TSC — TSF27 Portal</span>
+  </div>
+  <ul class="navbar-nav">
+    <li><a href="dashboard.html">📋 Dashboard</a></li>
+    <li><a href="form27.html" class="active">📝 Application</a></li>
+  </ul>
+  <div class="navbar-user" id="nav-user">
+    <div class="avatar">?</div>
+    <span>Loading…</span>
+  </div>
+  <button class="btn-logout" onclick="Auth.signOut()">Sign Out</button>
+</nav>
+
+<!-- ── Progress Bar ── -->
+<div class="form-progress-wrap">
+  <div class="progress-steps" id="progress-steps">
+    <!-- Injected by JS -->
+  </div>
+</div>
+
+<!-- ── Form Body ── -->
+<div class="form27-body">
+
+  <!-- ──────────────────────────────────
+       STEP 1 — Personal Details
+  ────────────────────────────────── -->
+  <div class="form-step active" id="step-1">
+
+    <div class="form-header-card">
+      <div class="header-icon">👤</div>
+      <div>
+        <h2>Teacher Admissions Management Form (TSF27)</h2>
+        <p>Teaching Service Commission — Papua New Guinea | Please fill all required fields.</p>
+      </div>
+    </div>
+
+    <!-- Sector selector -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h3>Sector</h3>
+        <span class="section-badge">Required</span>
+      </div>
+      <div class="form-section-body">
+        <label style="font-size:.85rem; color:var(--gray-600); font-weight:600; margin-bottom:.6rem; display:block;">
+          Confirm by selecting the Sector Box: <span class="req">*</span>
+        </label>
+        <div class="sector-grid">
+          <label class="sector-chip" for="s-elm">
+            <input type="radio" name="sector" id="s-elm" value="ELM/ECE" />
+            ELM/ECE
+          </label>
+          <label class="sector-chip" for="s-prim">
+            <input type="radio" name="sector" id="s-prim" value="PRIM" />
+            PRIM
+          </label>
+          <label class="sector-chip" for="s-high">
+            <input type="radio" name="sector" id="s-high" value="HIGH/SEC" />
+            HIGH/SEC
+          </label>
+          <label class="sector-chip" for="s-vet">
+            <input type="radio" name="sector" id="s-vet" value="VET" />
+            VET
+          </label>
+          <label class="sector-chip" for="s-nsoe">
+            <input type="radio" name="sector" id="s-nsoe" value="NSOE" />
+            NSOE
+          </label>
+          <label class="sector-chip" for="s-ierc">
+            <input type="radio" name="sector" id="s-ierc" value="IERC" />
+            IERC
+          </label>
+          <label class="sector-chip" for="s-fode">
+            <input type="radio" name="sector" id="s-fode" value="FODE" />
+            FODE
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 1: Personal Details -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h3>1. Personal Details</h3>
+        <span class="section-badge">Section 1</span>
+      </div>
+      <div class="form-section-body">
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label for="first-name">1. First Name <span class="req">*</span></label>
+            <input type="text" id="first-name" class="form-control" placeholder="First name" />
+          </div>
+          <div class="form-group">
+            <label for="nid-no">6. NID No. / Birth Cert. No.</label>
+            <input type="text" id="nid-no" class="form-control" placeholder="NID or Birth Cert No." />
+          </div>
+
+          <div class="form-group">
+            <label for="sur-name">2. Sur Name <span class="req">*</span></label>
+            <input type="text" id="sur-name" class="form-control" placeholder="Surname / Family name" />
+          </div>
+          <div class="form-group">
+            <label for="nationality">7. Nationality</label>
+            <input type="text" id="nationality" class="form-control" placeholder="e.g. Papua New Guinean" value="Papua New Guinean" />
+          </div>
+
+          <div class="form-group">
+            <label>3. Gender <span class="req">*</span></label>
+            <div class="radio-group">
+              <label class="radio-pill">
+                <input type="radio" name="gender" value="M" /> Male (M)
+              </label>
+              <label class="radio-pill">
+                <input type="radio" name="gender" value="F" /> Female (F)
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="religion">8. Religion</label>
+            <input type="text" id="religion" class="form-control" placeholder="e.g. Christianity" />
+          </div>
+
+          <div class="form-group">
+            <label for="dob">4. Date of Birth (dd/mm/yyyy) <span class="req">*</span></label>
+            <input type="date" id="dob" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="mobile">9. Mobile No.</label>
+            <input type="tel" id="mobile" class="form-control" placeholder="+675 7XXX XXXX" />
+          </div>
+
+          <div class="form-group full">
+            <label>5. Marital Status <span class="req">*</span></label>
+            <div class="radio-group">
+              <label class="radio-pill"><input type="radio" name="marital" value="Married" /> Married</label>
+              <label class="radio-pill"><input type="radio" name="marital" value="Single" /> Single</label>
+              <label class="radio-pill"><input type="radio" name="marital" value="Separated" /> Separated</label>
+              <label class="radio-pill"><input type="radio" name="marital" value="Divorced" /> Divorced</label>
+              <label class="radio-pill"><input type="radio" name="marital" value="Widowed" /> Widowed</label>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label for="pay-account">Current Pay Method Account Details (attach bank confirmation)</label>
+            <input type="text" id="pay-account" class="form-control" placeholder="Bank name, branch, account number" />
+          </div>
+
+          <!-- Appointment Status -->
+          <div class="form-group full">
+            <label>6. Appointment Status</label>
+            <div class="radio-group">
+              <label class="radio-pill"><input type="radio" name="appointment" value="Serving Teacher" /> Serving Teacher</label>
+              <label class="radio-pill"><input type="radio" name="appointment" value="Acting" /> Acting</label>
+              <label class="radio-pill"><input type="radio" name="appointment" value="Tenure" /> Tenure</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="teaching-position">Specify Full Teaching Position</label>
+            <input type="text" id="teaching-position" class="form-control" placeholder="e.g. Primary School Teacher" />
+          </div>
+          <div class="form-group">
+            <label for="prov-sch">Prov / Sch / Code / Pos</label>
+            <input type="text" id="prov-sch" class="form-control" placeholder="Province / School / Code / Position" />
+          </div>
+
+          <div class="form-group">
+            <label for="sub-eligibility">Serving Teachers Sub &amp; Eligibility Status</label>
+            <input type="text" id="sub-eligibility" class="form-control" placeholder="e.g. Eligible / Not Eligible" />
+          </div>
+          <div class="form-group">
+            <label for="current-fn">Current FN/</label>
+            <input type="text" id="current-fn" class="form-control" placeholder="Current FN number" />
+          </div>
+
+          <div class="form-group">
+            <label for="year-inspection">Year of Last Inspection</label>
+            <input type="text" id="year-inspection" class="form-control" placeholder="e.g. 2023" maxlength="4" />
+          </div>
+          <div class="form-group" style="display:flex; align-items:flex-end; padding-bottom:.25rem;">
+            <label style="display:flex; align-items:center; gap:.6rem; cursor:pointer; text-transform:none; letter-spacing:0; font-weight:500; font-size:.92rem;">
+              <input type="checkbox" id="is-new-hire" style="width:18px; height:18px; accent-color:var(--navy);" />
+              New Hire
+            </label>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <a href="dashboard.html" class="btn btn-outline">← Back to Dashboard</a>
+      <div class="form-nav-right">
+        <button class="btn btn-outline" onclick="saveDraft()">💾 Save Draft</button>
+        <button class="btn btn-primary" onclick="goToStep(2)">Next: Place of Origin →</button>
+      </div>
+    </div>
+
+  </div><!-- /step-1 -->
+
+
+  <!-- ──────────────────────────────────
+       STEP 2 — Origin & Family
+  ────────────────────────────────── -->
+  <div class="form-step" id="step-2">
+
+    <div class="form-header-card">
+      <div class="header-icon">🏡</div>
+      <div>
+        <h2>Place of Origin &amp; Family Information</h2>
+        <p>Sections 2 &amp; 3 — Origin details and dependants.</p>
+      </div>
+    </div>
+
+    <!-- Section 2: Place of Origin -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h3>2. Place of Origin</h3>
+        <span class="section-badge">Section 2</span>
+      </div>
+      <div class="form-section-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="home-village">1. Home Village / Place of Origin</label>
+            <input type="text" id="home-village" class="form-control" placeholder="Home village" />
+          </div>
+          <div class="form-group">
+            <label for="home-province">2. Home Province of Origin</label>
+            <select id="home-province" class="form-control">
+              <option value="">— Select Province —</option>
+              <option>Central</option><option>Chimbu (Simbu)</option>
+              <option>Eastern Highlands</option><option>East New Britain</option>
+              <option>East Sepik</option><option>Enga</option>
+              <option>Gulf</option><option>Hela</option>
+              <option>Jiwaka</option><option>Madang</option>
+              <option>Manus</option><option>Milne Bay</option>
+              <option>Morobe</option><option>National Capital District</option>
+              <option>New Ireland</option><option>Northern (Oro)</option>
+              <option>Sandaun (West Sepik)</option><option>Southern Highlands</option>
+              <option>Western</option><option>Western Highlands</option>
+              <option>West New Britain</option><option>Bougainville</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="home-district">3. Home District of Origin</label>
+            <input type="text" id="home-district" class="form-control" placeholder="District" />
+          </div>
+          <div class="form-group">
+            <label for="home-llg">4. Home LLG of Origin</label>
+            <input type="text" id="home-llg" class="form-control" placeholder="Local Level Government" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3a: Spouse -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h3>3. Family Information — (a) Spouse Information (if married)</h3>
+        <span class="section-badge">Section 3a</span>
+      </div>
+      <div class="form-section-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="spouse-name">1. Spouse Name</label>
+            <input type="text" id="spouse-name" class="form-control" placeholder="Full name of spouse" />
+          </div>
+          <div class="form-group">
+            <label for="spouse-dob">2. Date of Birth</label>
+            <input type="date" id="spouse-dob" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="spouse-employer">3. Employer</label>
+            <input type="text" id="spouse-employer" class="form-control" placeholder="Employer name" />
+          </div>
+          <div class="form-group">
+            <label for="spouse-emp-no">4. Employer No. (if Govt employee)</label>
+            <input type="text" id="spouse-emp-no" class="form-control" placeholder="Government employee number" />
+          </div>
+          <div class="form-group">
+            <label for="spouse-province">5. Home Province</label>
+            <select id="spouse-province" class="form-control">
+              <option value="">— Select Province —</option>
+              <option>Central</option><option>Chimbu (Simbu)</option>
+              <option>Eastern Highlands</option><option>East New Britain</option>
+              <option>East Sepik</option><option>Enga</option>
+              <option>Gulf</option><option>Hela</option><option>Jiwaka</option>
+              <option>Madang</option><option>Manus</option><option>Milne Bay</option>
+              <option>Morobe</option><option>National Capital District</option>
+              <option>New Ireland</option><option>Northern (Oro)</option>
+              <option>Sandaun (West Sepik)</option><option>Southern Highlands</option>
+              <option>Western</option><option>Western Highlands</option>
+              <option>West New Britain</option><option>Bougainville</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="spouse-district">6. Home District</label>
+            <input type="text" id="spouse-district" class="form-control" placeholder="District" />
+          </div>
+          <div class="form-group">
+            <label for="spouse-village">7. Home Village</label>
+            <input type="text" id="spouse-village" class="form-control" placeholder="Home village" />
+          </div>
+          <div class="form-group">
+            <label for="num-dependents">8. No. of Dependents</label>
+            <input type="number" id="num-dependents" class="form-control" placeholder="0" min="0" max="20" value="0" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3b: Dependents -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h3>3. Family Information — (b) Dependents' Information (legal dependents only)</h3>
+        <span class="section-badge">Section 3b</span>
+      </div>
+      <div class="form-section-body">
+        <table class="dep-table" id="dep-table">
+          <thead>
+            <tr>
+              <th style="width:40%">Name</th>
+              <th style="width:25%">Date of Birth</th>
+              <th style="width:28%">Relationship</th>
+              <th style="width:7%"></th>
+            </tr>
+          </thead>
+          <tbody id="dep-body">
+            <!-- rows injected -->
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-outline" onclick="addDepRow()" style="margin-top:.85rem; font-size:.85rem; padding:.5rem 1rem;">
+          + Add Dependent
+        </button>
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn btn-outline" onclick="goToStep(1)">← Back</button>
+      <div class="form-nav-right">
+        <button class="btn btn-outline" onclick="saveDraft()">💾 Save Draft</button>
+        <button class="btn btn-primary" onclick="goToStep(3)">Next: Qualifications →</button>
+      </div>
+    </div>
+
+  </div><!-- /step-2 -->
+
+
+  <!-- ──────────────────────────────────
+       STEP 3 — Qualifications
+  ────────────────────────────────── -->
+  <div class="form-step" id="step-3">
+
+    <div class="form-header-card">
+      <div class="header-icon">🎓</div>
+      <div>
+        <h2>Qualifications</h2>
+        <p>Section 4 — Updated CV with all qualifications must be attached.</p>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-header">
+        <h3>4. Qualifications</h3>
+        <span class="section-badge">Section 4</span>
+      </div>
+      <div class="form-section-body">
+
+        <!-- Highest Qualification -->
+        <div class="form-group">
+          <label>1. Highest Qualification</label>
+          <div class="radio-group">
+            <label class="radio-pill"><input type="radio" name="highest-qual" value="MASTER" /> Master</label>
+            <label class="radio-pill"><input type="radio" name="highest-qual" value="DEGREE" /> Degree</label>
+            <label class="radio-pill"><input type="radio" name="highest-qual" value="DIPLOMA" /> Diploma</label>
+            <label class="radio-pill"><input type="radio" name="highest-qual" value="CERT" /> Certificate</label>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="institution">2. Institution Graduated (specify)</label>
+            <input type="text" id="institution" class="form-control" placeholder="Name of institution" />
+          </div>
+          <div class="form-group">
+            <label for="year-completion">3. Year of Completion (H–L)</label>
+            <input type="text" id="year-completion" class="form-control" placeholder="e.g. 2018" maxlength="10" />
+          </div>
+          <div class="form-group full">
+            <label for="other-qual">4. Other Additional Qualification Obtained (specify year graduate)</label>
+            <input type="text" id="other-qual" class="form-control" placeholder="e.g. Certificate in Computing — 2016" />
+          </div>
+        </div>
+
+        <!-- Teacher Registration -->
+        <div class="form-group" style="margin-top:.5rem;">
+          <label>Teacher Prov / Registration Cert Status</label>
+          <div class="radio-group">
+            <label class="radio-pill"><input type="radio" name="reg-status" value="Expired" /> Expired</label>
+            <label class="radio-pill"><input type="radio" name="reg-status" value="Full" /> Full</label>
+            <label class="radio-pill"><input type="radio" name="reg-status" value="Current" /> Current</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reg-detail">Registration Certificate Details</label>
+          <input type="text" id="reg-detail" class="form-control" placeholder="Registration number and expiry date" />
+        </div>
+
+        <hr style="border:none; border-top:1px solid var(--gray-200); margin:1.25rem 0;" />
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="school-grade12">5. School Completed Grade 10/12 (Name of School)</label>
+            <input type="text" id="school-grade12" class="form-control" placeholder="School name" />
+          </div>
+          <div class="form-group">
+            <label for="year-grade12">6. Year of Completion Grade 12</label>
+            <input type="text" id="year-grade12" class="form-control" placeholder="e.g. 2010" maxlength="4" />
+          </div>
+          <div class="form-group">
+            <label for="school-fode">7. School Completed FODE/DODL (Name of School)</label>
+            <input type="text" id="school-fode" class="form-control" placeholder="School name" />
+          </div>
+          <div class="form-group">
+            <label for="year-grade10">8. Year of Completion (Grade 10)</label>
+            <input type="text" id="year-grade10" class="form-control" placeholder="e.g. 2008" maxlength="4" />
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Section 5: Teaching Position -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h3>5. Teaching Position / Appointment Details</h3>
+        <span class="section-badge">Section 5</span>
+      </div>
+      <div class="form-section-body">
+        <p style="font-size:.85rem; color:var(--gray-600); margin-bottom:1rem;">
+          <strong>For new NTQ admission:</strong> specify the province of your choice to teach.
+          <strong>For current members and former members:</strong> state recent appointment details.
+        </p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="teach-prov">Teaching Province</label>
+            <select id="teach-prov" class="form-control">
+              <option value="">— Select Province —</option>
+              <option>Central</option><option>Chimbu (Simbu)</option>
+              <option>Eastern Highlands</option><option>East New Britain</option>
+              <option>East Sepik</option><option>Enga</option>
+              <option>Gulf</option><option>Hela</option><option>Jiwaka</option>
+              <option>Madang</option><option>Manus</option><option>Milne Bay</option>
+              <option>Morobe</option><option>National Capital District</option>
+              <option>New Ireland</option><option>Northern (Oro)</option>
+              <option>Sandaun (West Sepik)</option><option>Southern Highlands</option>
+              <option>Western</option><option>Western Highlands</option>
+              <option>West New Britain</option><option>Bougainville</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="teach-location">Teaching Position / Location</label>
+            <input type="text" id="teach-location" class="form-control" placeholder="School name or location" />
+          </div>
+          <div class="form-group">
+            <label for="teach-start">Date of Commencement as a Teacher (Start Date)</label>
+            <input type="date" id="teach-start" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="leave-duration">Specify Any Long Leave Taken (Year / Duration)</label>
+            <input type="text" id="leave-duration" class="form-control" placeholder="e.g. 2020 – 6 months" />
+          </div>
+          <div class="form-group full">
+            <label for="resumption">Resumption After Leave</label>
+            <input type="text" id="resumption" class="form-control" placeholder="Date and details of resumption" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn btn-outline" onclick="goToStep(2)">← Back</button>
+      <div class="form-nav-right">
+        <button class="btn btn-outline" onclick="saveDraft()">💾 Save Draft</button>
+        <button class="btn btn-primary" onclick="goToStep(4)">Next: Declaration →</button>
+      </div>
+    </div>
+
+  </div><!-- /step-3 -->
+
+
+  <!-- ──────────────────────────────────
+       STEP 4 — Declaration & Submit
+  ────────────────────────────────── -->
+  <div class="form-step" id="step-4">
+
+    <div class="form-header-card">
+      <div class="header-icon">✍️</div>
+      <div>
+        <h2>Declaration &amp; Certification</h2>
+        <p>Sections 6 &amp; 7 — Affirmation of service and personal certification.</p>
+      </div>
+    </div>
+
+    <!-- Section 6: Affirmation -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h3>6. Statement of Affirmation</h3>
+        <span class="section-badge">Section 6</span>
+      </div>
+      <div class="form-section-body">
+        <p style="font-size:.85rem; color:var(--gray-600); margin-bottom:1rem;">
+          For current serving members and those seeking Admission into TSC.
+        </p>
+
+        <div class="form-group">
+          <label for="affirm-name">Full Name (for Affirmation) <span class="req">*</span></label>
+          <input type="text" id="affirm-name" class="form-control" placeholder="Your full legal name" />
+        </div>
+
+        <div class="affirmation-text">
+          I, <strong id="affirm-name-display">__________________________</strong>,
+          do swear that I will give good and faithful service as a member of the
+          Teaching Service of Papua New Guinea.
+          <br /><br />
+          I ................................................ do solemnly and sincerely promise and declare
+          that I will be committed in my teaching duties, serving with due diligence, uphold transparency
+          and be a faithful Teaching Service member of Teaching Service. Should my actions act contrary
+          to the provisions of TSC Act, I will be held accountable for my actions.
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="witness-name">Witness Name (HT / TSC Prov Rep)</label>
+            <input type="text" id="witness-name" class="form-control" placeholder="Head Teacher or TSC Representative" />
+          </div>
+          <div class="form-group">
+            <label for="affirm-date">Date of Affirmation</label>
+            <input type="date" id="affirm-date" class="form-control" />
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:.75rem;">
+          <label style="display:flex; align-items:flex-start; gap:.6rem; cursor:pointer; text-transform:none; letter-spacing:0; font-weight:500; color:var(--gray-800); font-size:.95rem;">
+            <input type="checkbox" id="affirm-signed" style="width:18px; height:18px; margin-top:.1rem; accent-color:var(--navy); flex-shrink:0;" />
+            I hereby affirm and agree to the above Statement of Affirmation. <span class="req">*</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 7: Certification -->
+    <div class="form-section">
+      <div class="form-section-header">
+        <h3>7. Certification</h3>
+        <span class="section-badge">Section 7</span>
+      </div>
+      <div class="form-section-body">
+        <div class="affirmation-text">
+          I sincerely vow that all information provided is genuine and correct to the best of my knowledge
+          hence I now sign with my own hand.
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="cert-date">Date of Certification <span class="req">*</span></label>
+            <input type="date" id="cert-date" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:.75rem;">
+          <label style="display:flex; align-items:flex-start; gap:.6rem; cursor:pointer; text-transform:none; letter-spacing:0; font-weight:500; color:var(--gray-800); font-size:.95rem;">
+            <input type="checkbox" id="cert-signed" style="width:18px; height:18px; margin-top:.1rem; accent-color:var(--navy); flex-shrink:0;" />
+            I certify that all information provided in this form is true and correct. <span class="req">*</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Review Summary -->
+    <div class="form-section" id="review-summary">
+      <div class="form-section-header">
+        <h3>📋 Application Summary</h3>
+        <span class="section-badge">Review</span>
+      </div>
+      <div class="form-section-body" id="review-body">
+        <!-- Filled by JS -->
+      </div>
+    </div>
+
+    <div class="form-nav">
+      <button class="btn btn-outline" onclick="goToStep(3)">← Back</button>
+      <div class="form-nav-right">
+        <button class="btn btn-outline" onclick="saveDraft()">💾 Save Draft</button>
+        <button class="btn btn-gold btn-lg" id="submit-btn" onclick="submitForm()">
+          🚀 Submit Application
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /step-4 -->
+
+
+  <!-- ──────────────────────────────────
+       STEP 5 — Success
+  ────────────────────────────────── -->
+  <div class="form-step" id="step-5">
+    <div style="text-align:center; padding:4rem 2rem; max-width:600px; margin:0 auto;">
+      <div style="font-size:5rem; margin-bottom:1rem;">✅</div>
+      <h2 style="font-family:var(--font-heading); color:var(--navy-dark); font-size:2rem; margin-bottom:.75rem;">
+        Application Submitted!
+      </h2>
+      <p style="color:var(--gray-600); font-size:1rem; line-height:1.7; margin-bottom:2rem;">
+        Your TSF27 Teacher Admissions Management Form has been successfully submitted to
+        the Teaching Service Commission of Papua New Guinea.
+        You will be notified of the outcome by TSC.
+      </p>
+      <div style="background:var(--gray-50); border:1.5px solid var(--gray-200); border-radius:var(--radius-lg); padding:1.25rem; margin-bottom:2rem; text-align:left;">
+        <div style="font-size:.82rem; color:var(--gray-400); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.4rem;">Submission Reference</div>
+        <div id="submission-id" style="font-family:monospace; font-size:1.05rem; color:var(--navy-dark); font-weight:700;">—</div>
+      </div>
+      <a href="dashboard.html" class="btn btn-primary btn-lg">Go to Dashboard</a>
+    </div>
+  </div>
+
+</div><!-- .form27-body -->
+
+<div id="toast-container"></div>
+
+<!-- Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+// ============================================================
+// TSF27 FORM — Main JavaScript
+// ============================================================
+
+let currentStep  = 1;
+const TOTAL_STEPS = 4;  // 5 is success screen
+let formId = null;
+let userId = null;
+let isViewMode = false;
+
+const STEPS = [
+  { label: 'Personal' },
+  { label: 'Origin & Family' },
+  { label: 'Qualifications' },
+  { label: 'Declaration' },
+];
+
+// ── Init ──────────────────────────────────────────────────
+(async () => {
+  const user = await Auth.requireAuth();
+  if (!user) return;
+  userId = user.id;
+  await initNavbar();
+
+  const params = new URLSearchParams(window.location.search);
+  formId     = params.get('id');
+  isViewMode = params.get('view') === '1';
+
+  renderProgress(1);
+  initDependentsTable();
+
+  if (formId) {
+    await loadFormData(formId);
+  }
+
+  // Today default for dates
+  const today = new Date().toISOString().split('T')[0];
+  if (!document.getElementById('affirm-date').value) document.getElementById('affirm-date').value = today;
+  if (!document.getElementById('cert-date').value)   document.getElementById('cert-date').value   = today;
+
+  // Live affirmation name update
+  document.getElementById('affirm-name').addEventListener('input', function() {
+    document.getElementById('affirm-name-display').textContent = this.value || '__________________________';
+  });
+
+  if (isViewMode) {
+    document.querySelectorAll('.form-control, input, select, textarea').forEach(el => el.disabled = true);
+    document.querySelectorAll('.btn-gold, button[onclick="saveDraft()"]').forEach(b => b.style.display = 'none');
+    document.querySelector('#step-4 .form-nav-right').innerHTML = `<a href="dashboard.html" class="btn btn-primary">← Back to Dashboard</a>`;
+    showToast('Viewing submitted application (read only)', 'info');
+  }
+})();
+
+// ── Progress Steps ────────────────────────────────────────
+function renderProgress(activeStep) {
+  const wrap = document.getElementById('progress-steps');
+  wrap.innerHTML = STEPS.map((s, i) => {
+    const n = i + 1;
+    const done   = n < activeStep;
+    const active = n === activeStep;
+    return `
+      <div class="progress-step">
+        <div style="position:relative;">
+          <div class="step-dot ${done ? 'done' : active ? 'active' : ''}">
+            ${done ? '✓' : n}
+          </div>
+          <div class="step-info" style="position:absolute; top:36px; left:50%; transform:translateX(-50%); white-space:nowrap; font-size:.72rem; color:${active ? 'var(--navy)' : 'var(--gray-400)'}; font-weight:${active ? '600' : '400'};">
+            ${s.label}
+          </div>
+        </div>
+        ${i < STEPS.length - 1 ? `<div class="step-line ${done ? 'done' : ''}"></div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Navigation ────────────────────────────────────────────
+function goToStep(n) {
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  currentStep = n;
+  document.getElementById(`step-${n}`).classList.add('active');
+  renderProgress(n);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (n === 4) buildReview();
+}
+
+// ── Read form values ──────────────────────────────────────
+function getFormData() {
+  return {
+    sector: document.querySelector('input[name="sector"]:checked')?.value || null,
+    // Section 1
+    first_name:            document.getElementById('first-name').value.trim() || null,
+    sur_name:              document.getElementById('sur-name').value.trim() || null,
+    gender:                document.querySelector('input[name="gender"]:checked')?.value || null,
+    date_of_birth:         document.getElementById('dob').value || null,
+    marital_status:        document.querySelector('input[name="marital"]:checked')?.value || null,
+    nid_birth_cert_no:     document.getElementById('nid-no').value.trim() || null,
+    nationality:           document.getElementById('nationality').value.trim() || null,
+    religion:              document.getElementById('religion').value.trim() || null,
+    mobile_no:             document.getElementById('mobile').value.trim() || null,
+    pay_method_account:    document.getElementById('pay-account').value.trim() || null,
+    appointment_status:    document.querySelector('input[name="appointment"]:checked')?.value || null,
+    teaching_position:     document.getElementById('teaching-position').value.trim() || null,
+    prov_sch_code_pos:     document.getElementById('prov-sch').value.trim() || null,
+    sub_eligibility_status:document.getElementById('sub-eligibility').value.trim() || null,
+    current_fn:            document.getElementById('current-fn').value.trim() || null,
+    year_last_inspection:  document.getElementById('year-inspection').value.trim() || null,
+    is_new_hire:           document.getElementById('is-new-hire').checked,
+    // Section 2
+    home_village:    document.getElementById('home-village').value.trim() || null,
+    home_province:   document.getElementById('home-province').value || null,
+    home_district:   document.getElementById('home-district').value.trim() || null,
+    home_llg:        document.getElementById('home-llg').value.trim() || null,
+    // Section 3a
+    spouse_name:         document.getElementById('spouse-name').value.trim() || null,
+    spouse_dob:          document.getElementById('spouse-dob').value || null,
+    spouse_employer:     document.getElementById('spouse-employer').value.trim() || null,
+    spouse_employer_no:  document.getElementById('spouse-emp-no').value.trim() || null,
+    spouse_home_province:document.getElementById('spouse-province').value || null,
+    spouse_home_district:document.getElementById('spouse-district').value.trim() || null,
+    spouse_home_village: document.getElementById('spouse-village').value.trim() || null,
+    no_of_dependents:    parseInt(document.getElementById('num-dependents').value) || 0,
+    // Section 3b
+    dependents: getDependentsData(),
+    // Section 4
+    highest_qualification:   document.querySelector('input[name="highest-qual"]:checked')?.value || null,
+    institution_graduated:   document.getElementById('institution').value.trim() || null,
+    year_of_completion:      document.getElementById('year-completion').value.trim() || null,
+    other_qualification:     document.getElementById('other-qual').value.trim() || null,
+    teacher_reg_cert_status: document.querySelector('input[name="reg-status"]:checked')?.value || null,
+    teacher_reg_cert_detail: document.getElementById('reg-detail').value.trim() || null,
+    school_grade_10_12:      document.getElementById('school-grade12').value.trim() || null,
+    year_completion_grade_12:document.getElementById('year-grade12').value.trim() || null,
+    school_fode_dodl:        document.getElementById('school-fode').value.trim() || null,
+    year_completion_grade_10:document.getElementById('year-grade10').value.trim() || null,
+    // Section 5
+    teaching_prov:          document.getElementById('teach-prov').value || null,
+    teaching_location:      document.getElementById('teach-location').value.trim() || null,
+    start_date:             document.getElementById('teach-start').value || null,
+    long_leave_duration:    document.getElementById('leave-duration').value.trim() || null,
+    resumption_after_leave: document.getElementById('resumption').value.trim() || null,
+    // Section 6
+    affirmation_name:   document.getElementById('affirm-name').value.trim() || null,
+    affirmation_signed: document.getElementById('affirm-signed').checked,
+    affirmation_date:   document.getElementById('affirm-date').value || null,
+    witness_name:       document.getElementById('witness-name').value.trim() || null,
+    // Section 7
+    certification_signed: document.getElementById('cert-signed').checked,
+    certification_date:   document.getElementById('cert-date').value || null,
+  };
+}
+
+// ── Dependents table ──────────────────────────────────────
+function initDependentsTable() {
+  addDepRow(); addDepRow(); // start with 2 rows
+}
+
+function addDepRow() {
+  const body = document.getElementById('dep-body');
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" class="dep-name" placeholder="Full name" /></td>
+    <td><input type="date" class="dep-dob" /></td>
+    <td>
+      <select class="dep-rel" style="border:none;width:100%;font-family:var(--font-body);font-size:.88rem;outline:none;background:transparent;">
+        <option value="">— Relationship —</option>
+        <option>Son</option><option>Daughter</option>
+        <option>Spouse</option><option>Father</option>
+        <option>Mother</option><option>Sibling</option><option>Other</option>
+      </select>
+    </td>
+    <td style="text-align:center;">
+      <button class="del-btn" onclick="this.closest('tr').remove()" title="Remove">✕</button>
+    </td>
+  `;
+  body.appendChild(tr);
+}
+
+function getDependentsData() {
+  const rows = document.querySelectorAll('#dep-body tr');
+  const deps = [];
+  rows.forEach(row => {
+    const name = row.querySelector('.dep-name')?.value.trim();
+    const dob  = row.querySelector('.dep-dob')?.value;
+    const rel  = row.querySelector('.dep-rel')?.value;
+    if (name || dob || rel) deps.push({ name: name || null, dob: dob || null, relationship: rel || null });
+  });
+  return deps;
+}
+
+function populateDependents(deps) {
+  const body = document.getElementById('dep-body');
+  body.innerHTML = '';
+  (deps || []).forEach(dep => {
+    addDepRow();
+    const rows = body.querySelectorAll('tr');
+    const lastRow = rows[rows.length - 1];
+    lastRow.querySelector('.dep-name').value = dep.name || '';
+    lastRow.querySelector('.dep-dob').value  = dep.dob  || '';
+    lastRow.querySelector('.dep-rel').value  = dep.relationship || '';
+  });
+  if ((deps || []).length === 0) { addDepRow(); addDepRow(); }
+}
+
+// ── Set form values from DB ───────────────────────────────
+function setFormValues(data) {
+  const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+  const setRadio = (name, val) => {
+    if (!val) return;
+    const el = document.querySelector(`input[name="${name}"][value="${val}"]`);
+    if (el) el.checked = true;
+  };
+  const setCheck = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+
+  // Sector
+  setRadio('sector', data.sector);
+  // Section 1
+  set('first-name', data.first_name); set('sur-name', data.sur_name);
+  setRadio('gender', data.gender);
+  set('dob', data.date_of_birth);
+  setRadio('marital', data.marital_status);
+  set('nid-no', data.nid_birth_cert_no); set('nationality', data.nationality);
+  set('religion', data.religion); set('mobile', data.mobile_no);
+  set('pay-account', data.pay_method_account);
+  setRadio('appointment', data.appointment_status);
+  set('teaching-position', data.teaching_position); set('prov-sch', data.prov_sch_code_pos);
+  set('sub-eligibility', data.sub_eligibility_status); set('current-fn', data.current_fn);
+  set('year-inspection', data.year_last_inspection); setCheck('is-new-hire', data.is_new_hire);
+  // Section 2
+  set('home-village', data.home_village); set('home-province', data.home_province);
+  set('home-district', data.home_district); set('home-llg', data.home_llg);
+  // Section 3a
+  set('spouse-name', data.spouse_name); set('spouse-dob', data.spouse_dob);
+  set('spouse-employer', data.spouse_employer); set('spouse-emp-no', data.spouse_employer_no);
+  set('spouse-province', data.spouse_home_province); set('spouse-district', data.spouse_home_district);
+  set('spouse-village', data.spouse_home_village); set('num-dependents', data.no_of_dependents);
+  populateDependents(data.dependents);
+  // Section 4
+  setRadio('highest-qual', data.highest_qualification);
+  set('institution', data.institution_graduated); set('year-completion', data.year_of_completion);
+  set('other-qual', data.other_qualification);
+  setRadio('reg-status', data.teacher_reg_cert_status);
+  set('reg-detail', data.teacher_reg_cert_detail);
+  set('school-grade12', data.school_grade_10_12); set('year-grade12', data.year_completion_grade_12);
+  set('school-fode', data.school_fode_dodl); set('year-grade10', data.year_completion_grade_10);
+  // Section 5
+  set('teach-prov', data.teaching_prov); set('teach-location', data.teaching_location);
+  set('teach-start', data.start_date); set('leave-duration', data.long_leave_duration);
+  set('resumption', data.resumption_after_leave);
+  // Section 6
+  set('affirm-name', data.affirmation_name);
+  document.getElementById('affirm-name-display').textContent = data.affirmation_name || '__________________________';
+  setCheck('affirm-signed', data.affirmation_signed);
+  set('affirm-date', data.affirmation_date); set('witness-name', data.witness_name);
+  // Section 7
+  setCheck('cert-signed', data.certification_signed);
+  set('cert-date', data.certification_date);
+}
+
+// ── Load existing form ────────────────────────────────────
+async function loadFormData(id) {
+  const { data, error } = await db
+    .from('form27_submissions')
+    .select('*')
+    .eq('id', id)
+    .eq('user_id', userId)
+    .single();
+
+  if (error || !data) {
+    showToast('Could not load form data.', 'error');
+    return;
+  }
+  setFormValues(data);
+  showToast(data.status === 'draft' ? 'Draft loaded — continue editing.' : 'Form loaded.', 'info');
+}
+
+// ── Save Draft ────────────────────────────────────────────
+async function saveDraft() {
+  const payload = { ...getFormData(), user_id: userId, status: 'draft' };
+
+  let error;
+  if (formId) {
+    const res = await db.from('form27_submissions').update(payload).eq('id', formId).eq('user_id', userId);
+    error = res.error;
+  } else {
+    const res = await db.from('form27_submissions').insert(payload).select('id').single();
+    error = res.error;
+    if (!error && res.data) {
+      formId = res.data.id;
+      window.history.replaceState({}, '', `form27.html?id=${formId}`);
+    }
+  }
+
+  if (error) { showToast('Error saving draft: ' + error.message, 'error'); return; }
+  showToast('Draft saved successfully!', 'success');
+}
+
+// ── Submit Form ───────────────────────────────────────────
+async function submitForm() {
+  // Validate required
+  const data = getFormData();
+  if (!data.first_name || !data.sur_name) { showToast('Please enter your First and Sur Name.', 'error'); goToStep(1); return; }
+  if (!data.gender)        { showToast('Please select your Gender.', 'error'); goToStep(1); return; }
+  if (!data.date_of_birth) { showToast('Please enter your Date of Birth.', 'error'); goToStep(1); return; }
+  if (!data.marital_status){ showToast('Please select your Marital Status.', 'error'); goToStep(1); return; }
+  if (!data.affirmation_signed) { showToast('Please sign the Affirmation.', 'error'); return; }
+  if (!data.certification_signed) { showToast('Please sign the Certification.', 'error'); return; }
+  if (!data.certification_date) { showToast('Please enter the Certification Date.', 'error'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const payload = {
+    ...data,
+    user_id: userId,
+    status: 'submitted',
+    submitted_at: new Date().toISOString()
+  };
+
+  let finalId;
+  if (formId) {
+    const { error } = await db.from('form27_submissions').update(payload).eq('id', formId).eq('user_id', userId);
+    if (error) { showToast('Submission error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '🚀 Submit Application'; return; }
+    finalId = formId;
+  } else {
+    const { data: ins, error } = await db.from('form27_submissions').insert(payload).select('id').single();
+    if (error) { showToast('Submission error: ' + error.message, 'error'); btn.disabled = false; btn.textContent = '🚀 Submit Application'; return; }
+    finalId = ins.id;
+  }
+
+  // Show success
+  document.getElementById(`step-4`).classList.remove('active');
+  document.getElementById('step-5').classList.add('active');
+  document.getElementById('submission-id').textContent = finalId;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── Build Review Summary ──────────────────────────────────
+function buildReview() {
+  const d  = getFormData();
+  const rv = (label, val) => `
+    <div class="review-item">
+      <div class="rv-label">${label}</div>
+      <div class="rv-value">${val || '<span style="color:var(--gray-400)">—</span>'}</div>
+    </div>`;
+
+  document.getElementById('review-body').innerHTML = `
+    <div class="review-section">
+      <h4>Personal Details</h4>
+      <div class="submit-review-grid">
+        ${rv('First Name', d.first_name)}
+        ${rv('Sur Name', d.sur_name)}
+        ${rv('Gender', d.gender === 'M' ? 'Male' : d.gender === 'F' ? 'Female' : null)}
+        ${rv('Date of Birth', formatDate(d.date_of_birth))}
+        ${rv('Marital Status', d.marital_status)}
+        ${rv('Nationality', d.nationality)}
+        ${rv('Mobile No.', d.mobile_no)}
+        ${rv('Appointment', d.appointment_status)}
+        ${rv('Sector', d.sector)}
+        ${rv('New Hire', d.is_new_hire ? 'Yes' : 'No')}
+      </div>
+    </div>
+    <div class="review-section">
+      <h4>Place of Origin</h4>
+      <div class="submit-review-grid">
+        ${rv('Home Village', d.home_village)}
+        ${rv('Province', d.home_province)}
+        ${rv('District', d.home_district)}
+        ${rv('LLG', d.home_llg)}
+      </div>
+    </div>
+    <div class="review-section">
+      <h4>Qualifications</h4>
+      <div class="submit-review-grid">
+        ${rv('Highest Qualification', d.highest_qualification)}
+        ${rv('Institution', d.institution_graduated)}
+        ${rv('Year of Completion', d.year_of_completion)}
+        ${rv('Reg. Cert Status', d.teacher_reg_cert_status)}
+      </div>
+    </div>
+    <div class="review-section">
+      <h4>Teaching Position</h4>
+      <div class="submit-review-grid">
+        ${rv('Province', d.teaching_prov)}
+        ${rv('Location', d.teaching_location)}
+        ${rv('Start Date', formatDate(d.start_date))}
+      </div>
+    </div>
+    <div style="background:var(--gray-50); border:1.5px solid var(--gold); border-radius:var(--radius); padding:1rem; margin-top:.5rem; font-size:.88rem; color:var(--gray-600);">
+      ⚠️ Please review all details above before submitting. Once submitted, the form cannot be edited.
+    </div>
+  `;
+}
+</script>
+
+</body>
+</html>

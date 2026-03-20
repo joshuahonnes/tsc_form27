@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – TSF27 | Teaching Service Commission</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar">
+  <div class="navbar-brand">
+    <div class="brand-icon">🏛️</div>
+    <span>TSC — TSF27 Portal</span>
+  </div>
+  <ul class="navbar-nav">
+    <li><a href="dashboard.html" class="active">📋 Dashboard</a></li>
+    <li><a href="form27.html">📝 New Application</a></li>
+    <li class="admin-only" style="display:none;"><a href="admin.html">⚙️ Admin</a></li>
+  </ul>
+  <div class="navbar-user" id="nav-user">
+    <div class="avatar">?</div>
+    <span>Loading…</span>
+  </div>
+  <button class="btn-logout" onclick="Auth.signOut()">Sign Out</button>
+</nav>
+
+<div class="page-content">
+
+  <!-- ── Page Header ── -->
+  <div class="page-header">
+    <div>
+      <h1>My Dashboard</h1>
+      <p>Manage your TSF27 Teacher Admissions applications.</p>
+    </div>
+    <a href="form27.html" class="btn btn-gold btn-lg">
+      + New TSF27 Application
+    </a>
+  </div>
+
+  <!-- ── Stats ── -->
+  <div class="stats-grid" id="stats-grid">
+    <div class="stat-card navy">
+      <div class="stat-icon">📋</div>
+      <div class="stat-value" id="count-all">—</div>
+      <div class="stat-label">Total Applications</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-icon">✏️</div>
+      <div class="stat-value" id="count-draft">—</div>
+      <div class="stat-label">Drafts</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value" id="count-approved">—</div>
+      <div class="stat-label">Approved</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-icon">🕐</div>
+      <div class="stat-value" id="count-submitted">—</div>
+      <div class="stat-label">Pending Review</div>
+    </div>
+  </div>
+
+  <!-- ── Applications Table ── -->
+  <div class="card">
+    <div class="card-header">
+      <h3>📁 My Applications</h3>
+      <div style="display:flex; gap:.6rem; align-items:center;">
+        <select id="filter-status" class="form-control" style="width:160px; padding:.5rem .8rem; font-size:.85rem;">
+          <option value="">All Status</option>
+          <option value="draft">Draft</option>
+          <option value="submitted">Submitted</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        <input
+          type="search" id="search-input" class="form-control"
+          placeholder="Search by name…"
+          style="width:200px; padding:.5rem .8rem; font-size:.85rem;"
+        />
+      </div>
+    </div>
+
+    <div id="table-area">
+      <div class="loader-wrap"><div class="spinner"></div></div>
+    </div>
+  </div>
+
+</div><!-- .page-content -->
+
+<div id="toast-container"></div>
+
+<!-- Delete Confirm Modal -->
+<div id="delete-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:200; align-items:center; justify-content:center;">
+  <div style="background:white; border-radius:14px; padding:2rem; max-width:400px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,.3);">
+    <div style="font-size:2.5rem; margin-bottom:1rem;">🗑️</div>
+    <h3 style="font-family:var(--font-heading); color:var(--navy-dark); margin-bottom:.5rem;">Delete Application?</h3>
+    <p style="font-size:.9rem; color:var(--gray-600); margin-bottom:1.5rem;">
+      This action cannot be undone. Only draft applications can be deleted.
+    </p>
+    <div style="display:flex; gap:.75rem; justify-content:flex-end;">
+      <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+let allForms = [];
+let deleteTargetId = null;
+
+(async () => {
+  const user = await Auth.requireAuth();
+  if (!user) return;
+  await initNavbar();
+  await loadForms(user.id);
+})();
+
+async function loadForms(userId) {
+  const { data, error } = await db
+    .from('form27_submissions')
+    .select('id, first_name, sur_name, sector, status, submitted_at, created_at, updated_at')
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false });
+
+  if (error) {
+    showToast('Error loading forms: ' + error.message, 'error');
+    return;
+  }
+
+  allForms = data || [];
+  updateStats(allForms);
+  renderTable(allForms);
+}
+
+function updateStats(forms) {
+  document.getElementById('count-all').textContent      = forms.length;
+  document.getElementById('count-draft').textContent    = forms.filter(f => f.status === 'draft').length;
+  document.getElementById('count-approved').textContent = forms.filter(f => f.status === 'approved').length;
+  document.getElementById('count-submitted').textContent= forms.filter(f => f.status === 'submitted').length;
+}
+
+function renderTable(forms) {
+  const area = document.getElementById('table-area');
+
+  if (forms.length === 0) {
+    area.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        <h3>No Applications Yet</h3>
+        <p>Start your TSF27 application to apply for admission into the Teaching Service.</p>
+        <a href="form27.html" class="btn btn-gold" style="margin-top:1.25rem;">+ Start New Application</a>
+      </div>
+    `;
+    return;
+  }
+
+  area.innerHTML = `
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Applicant Name</th>
+            <th>Sector</th>
+            <th>Status</th>
+            <th>Last Updated</th>
+            <th>Submitted</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${forms.map((f, i) => `
+            <tr>
+              <td style="color:var(--gray-400); font-size:.82rem;">${i + 1}</td>
+              <td>
+                <strong style="color:var(--navy-dark);">
+                  ${[f.first_name, f.sur_name].filter(Boolean).join(' ') || '<em style="color:var(--gray-400);">Unnamed Draft</em>'}
+                </strong>
+              </td>
+              <td><span style="font-size:.85rem; color:var(--gray-600);">${f.sector || '—'}</span></td>
+              <td>${statusBadge(f.status)}</td>
+              <td style="font-size:.85rem; color:var(--gray-600);">${formatDateTime(f.updated_at)}</td>
+              <td style="font-size:.85rem; color:var(--gray-600);">${f.submitted_at ? formatDate(f.submitted_at) : '—'}</td>
+              <td>
+                <div style="display:flex; gap:.4rem;">
+                  ${f.status === 'draft'
+                    ? `<a href="form27.html?id=${f.id}" class="btn btn-outline" style="padding:.35rem .7rem; font-size:.8rem;">✏️ Edit</a>`
+                    : `<a href="form27.html?id=${f.id}&view=1" class="btn btn-outline" style="padding:.35rem .7rem; font-size:.8rem;">👁 View</a>`
+                  }
+                  ${f.status === 'draft'
+                    ? `<button class="btn btn-danger" style="padding:.35rem .7rem; font-size:.8rem;" onclick="openDeleteModal('${f.id}')">🗑️</button>`
+                    : ''
+                  }
+                </div>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// Filter & search
+document.getElementById('filter-status').addEventListener('change', applyFilter);
+document.getElementById('search-input').addEventListener('input', applyFilter);
+
+function applyFilter() {
+  const status = document.getElementById('filter-status').value;
+  const search = document.getElementById('search-input').value.toLowerCase();
+
+  let filtered = allForms;
+  if (status)  filtered = filtered.filter(f => f.status === status);
+  if (search)  filtered = filtered.filter(f => {
+    const name = `${f.first_name} ${f.sur_name}`.toLowerCase();
+    return name.includes(search);
+  });
+
+  renderTable(filtered);
+}
+
+// Delete
+function openDeleteModal(id) {
+  deleteTargetId = id;
+  const m = document.getElementById('delete-modal');
+  m.style.display = 'flex';
+}
+function closeDeleteModal() {
+  document.getElementById('delete-modal').style.display = 'none';
+  deleteTargetId = null;
+}
+document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+  if (!deleteTargetId) return;
+  const { error } = await db
+    .from('form27_submissions')
+    .delete()
+    .eq('id', deleteTargetId)
+    .eq('status', 'draft');
+
+  closeDeleteModal();
+  if (error) { showToast('Error deleting: ' + error.message, 'error'); return; }
+  showToast('Application deleted.', 'success');
+
+  const user = await Auth.getUser();
+  await loadForms(user.id);
+});
+</script>
+</body>
+</html>
